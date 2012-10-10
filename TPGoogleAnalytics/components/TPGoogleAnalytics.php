@@ -17,6 +17,12 @@ class TPGoogleAnalytics extends CApplicationComponent
      * @var string
      */
     public $account;
+    
+    /**
+     * Prefix
+     * @var string
+     */
+    public $prefix = '';
 
     /**
      * Account ID, to be trusted (regexed)
@@ -169,7 +175,20 @@ class TPGoogleAnalytics extends CApplicationComponent
             {
                 $this->_trackPageview();
             }
-
+            
+            // Get the prefix information
+            if($this->prefix != '')
+            {
+                if(strpos($this->prefix, '.') === false)
+                {
+                    $this->prefix .= '.';
+                }
+            }
+            else
+            {
+                $this->prefix = '';
+            }
+            
             // Merge the datas
             $this->_data = array_merge($this->_data, $this->_delayedData);
 
@@ -177,17 +196,23 @@ class TPGoogleAnalytics extends CApplicationComponent
             $js = 'var _gaq = _gaq || [];' . PHP_EOL;
             foreach($this->_data as $data)
             {
+                // No prefixes for the first argument.
+                $prefixed = false;
+                
                 // Clean up each item
                 foreach($data as $key => $item)
                 {
+                    
                     if(is_string($item))
                     {
-                        $data[$key] = self::Q . preg_replace('~(?<!\\\)'. self::Q . '~', '\\'. self::Q, $item) . self::Q;
+                        $data[$key] = self::Q . ((!$prefixed) ? $this->prefix : '') . preg_replace('~(?<!\\\)'. self::Q . '~', '\\' . (($prefixed) ? $this->prefix : '') . self::Q, $item) . self::Q;
                     }
                     else if(is_bool($item))
                     {
                         $data[$key] = ($item) ? 'true' : 'false';
                     }
+                    
+                    $prefixed = true;
                 }
 
                 $js.= '_gaq.push([' . implode(',', $data) . ']);' . PHP_EOL;
@@ -199,6 +224,8 @@ class TPGoogleAnalytics extends CApplicationComponent
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
 // Google Analytics Extension provided by TagPla.net
+// https://github.com/TagPlanet/yii-analytics
+// Copyright 2012, TagPla.net & Philip Lawrence
 EOJS;
             // Should we auto add in the analytics tag?
             if($this->autoRender)
