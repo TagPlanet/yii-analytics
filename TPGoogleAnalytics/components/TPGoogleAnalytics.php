@@ -115,12 +115,6 @@ class TPGoogleAnalytics extends CApplicationComponent
     protected $_calledOptions = array();
 
     /**
-     * An array of all the data for _gaq that should be pushed after the _trackPageview
-     * @var array
-     */
-    protected $_delayedData = array();
-
-    /**
      * Method data to be pushed into the _gaq object
      * @var array
      */
@@ -188,9 +182,6 @@ class TPGoogleAnalytics extends CApplicationComponent
             {
                 $this->prefix = '';
             }
-            
-            // Merge the datas
-            $this->_data = array_merge($this->_data, $this->_delayedData);
 
             // Start the JS string
             $js = 'var _gaq = _gaq || [];' . PHP_EOL;
@@ -267,14 +258,7 @@ EOJS;
     protected function _push($variable, $arguments)
     {
         $data = array_merge(array($variable), $arguments);
-        if($variable == '_cookiePathCopy' || $variable == '_trackTrans')
-        {
-            array_push($this->_delayedData, $data);
-        }
-        else
-        {
-            array_push($this->_data, $data);
-        }
+        array_push($this->_data, $data);
         $this->_calledOptions[] = $variable;
     }
 }
