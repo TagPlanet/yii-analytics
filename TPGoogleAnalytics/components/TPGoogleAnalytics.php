@@ -8,7 +8,7 @@
  * @link https://github.com/TagPlanet/yii-analytics
  * @copyright Copyright &copy; 2012 Philip Lawrence
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * @version 1.0.1
+ * @version 1.0.2
  */
 class TPGoogleAnalytics extends CApplicationComponent
 {
